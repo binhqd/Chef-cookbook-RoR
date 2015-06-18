@@ -8,4 +8,6 @@ version          '0.1.0'
 
 depends "ruby"
 depends "mongodb"
-
+depends "nvm"
+depends "rvm"
+depends "rbenv"

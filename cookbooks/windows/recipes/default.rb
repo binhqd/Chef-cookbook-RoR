@@ -1,9 +1,9 @@
 #
-# Author:: Sean OMeara (<someara@chef.io>)
-# Author:: Joshua Timberman (<joshua@chef.io>)
-# Recipe:: yum::default
+# Author:: Seth Chisamore (<schisamo@chef.io>)
+# Cookbook Name:: windows
+# Recipe:: default
 #
-# Copyright 2013-2014, Chef Software, Inc (<legal@chef.io>)
+# Copyright:: 2011, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,17 +16,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-yum_repository 'epel' do
-  description 'Extra Packages for Enterprise Linux'
-  mirrorlist 'http://mirrors.fedoraproject.org/mirrorlist?repo=epel-6&arch=$basearch'
-  gpgkey 'http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6'
-  action :create
+#
+
+# gems with precompiled binaries
+%w{ win32-api win32-service }.each do |win_gem|
+  chef_gem win_gem do
+    options '--platform=mswin32'
+    action :install
+  end
 end
 
-yum_globalconfig '/etc/yum.conf' do
-  node['yum']['main'].each do |config, value|
-    send(config.to_sym, value)
+# the rest
+%w{ windows-api windows-pr win32-dir win32-event win32-mutex }.each do |win_gem|
+  chef_gem win_gem do
+    action :install
   end
-
-  action :create
 end

@@ -1,9 +1,8 @@
+# Encoding: utf-8
+# Cookbook Name:: dmg
+# Library:: matchers
 #
-# Author:: Sean OMeara (<someara@chef.io>)
-# Author:: Joshua Timberman (<joshua@chef.io>)
-# Recipe:: yum::default
-#
-# Copyright 2013-2014, Chef Software, Inc (<legal@chef.io>)
+# Copyright 2014, Fletcher Nichol <fnichol@nichol.ca>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,17 +15,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-yum_repository 'epel' do
-  description 'Extra Packages for Enterprise Linux'
-  mirrorlist 'http://mirrors.fedoraproject.org/mirrorlist?repo=epel-6&arch=$basearch'
-  gpgkey 'http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6'
-  action :create
-end
+#
 
-yum_globalconfig '/etc/yum.conf' do
-  node['yum']['main'].each do |config, value|
-    send(config.to_sym, value)
+if defined?(ChefSpec)
+  def install_dmg_package(app)
+    ChefSpec::Matchers::ResourceMatcher.new(:dmg_package, :install, app)
   end
-
-  action :create
 end

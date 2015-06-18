@@ -1,9 +1,10 @@
 #
-# Author:: Sean OMeara (<someara@chef.io>)
-# Author:: Joshua Timberman (<joshua@chef.io>)
-# Recipe:: yum::default
+# Cookbook Name:: rbenv
+# Recipe:: rbenv_vars
 #
-# Copyright 2013-2014, Chef Software, Inc (<legal@chef.io>)
+# Author:: Deepak Kannan (<kannan.deepak@gmail.com>)
+#
+# Copyright 2011-2012, Riot Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,17 +17,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-yum_repository 'epel' do
-  description 'Extra Packages for Enterprise Linux'
-  mirrorlist 'http://mirrors.fedoraproject.org/mirrorlist?repo=epel-6&arch=$basearch'
-  gpgkey 'http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6'
-  action :create
-end
+#
 
-yum_globalconfig '/etc/yum.conf' do
-  node['yum']['main'].each do |config, value|
-    send(config.to_sym, value)
+include_recipe "git"
+
+plugin_path = "#{node[:rbenv][:root]}/plugins/rbenv-vars"
+
+with_home_for_user(node[:rbenv][:user]) do
+
+  git plugin_path do
+    repository node[:rbenv_vars][:git_repository]
+    reference  node[:rbenv_vars][:git_revision]
+    action :sync
+    user node[:rbenv][:user]
+    group node[:rbenv][:group]
   end
 
-  action :create
 end

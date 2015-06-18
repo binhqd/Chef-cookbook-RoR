@@ -1,9 +1,10 @@
 #
-# Author:: Sean OMeara (<someara@chef.io>)
-# Author:: Joshua Timberman (<joshua@chef.io>)
-# Recipe:: yum::default
+# Cookbook Name:: rvm
+# Library: gem_package resource monkey patch
 #
-# Copyright 2013-2014, Chef Software, Inc (<legal@chef.io>)
+# Author:: Fletcher Nichol <fnichol@nichol.ca>
+#
+# Copyright 2011, Fletcher Nichol
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,17 +17,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-yum_repository 'epel' do
-  description 'Extra Packages for Enterprise Linux'
-  mirrorlist 'http://mirrors.fedoraproject.org/mirrorlist?repo=epel-6&arch=$basearch'
-  gpgkey 'http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6'
-  action :create
-end
+#
 
-yum_globalconfig '/etc/yum.conf' do
-  node['yum']['main'].each do |config, value|
-    send(config.to_sym, value)
+##
+# Patch Chef::Resource::GemPackage resource to use the RVMRubygems provider.
+# This has potentially dangerous side effects and should be considered
+# experimental. You have been warned.
+def patch_gem_package
+  ::Chef::Resource::GemPackage.class_eval do
+    def initialize(name, run_context=nil)
+      super
+      @resource_name = :gem_package
+      @provider = Chef::Provider::Package::RVMRubygems
+    end
   end
-
-  action :create
 end

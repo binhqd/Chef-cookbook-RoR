@@ -1,9 +1,10 @@
 #
-# Author:: Sean OMeara (<someara@chef.io>)
-# Author:: Joshua Timberman (<joshua@chef.io>)
-# Recipe:: yum::default
+# Cookbook Name:: rbenv
+# Library:: recipe_ext
 #
-# Copyright 2013-2014, Chef Software, Inc (<legal@chef.io>)
+# Author:: Jamie Winsor (<jamie@vialstudios.com>)
+#
+# Copyright 2011-2012, Riot Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,17 +17,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-yum_repository 'epel' do
-  description 'Extra Packages for Enterprise Linux'
-  mirrorlist 'http://mirrors.fedoraproject.org/mirrorlist?repo=epel-6&arch=$basearch'
-  gpgkey 'http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6'
-  action :create
-end
+#
 
-yum_globalconfig '/etc/yum.conf' do
-  node['yum']['main'].each do |config, value|
-    send(config.to_sym, value)
+class Chef
+  module Mixin
+    module Rbenv
+      # stub to satisfy RecipeExt (library load order not guaranteed)
+    end
   end
 
-  action :create
+  module Rbenv
+    module RecipeExt
+      include Chef::Mixin::Rbenv
+    end
+  end
 end
+
+Chef::Recipe.send(:include, Chef::Rbenv::RecipeExt)
